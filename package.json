@@ -8,6 +8,9 @@
   "devDependencies": {
     "eslint": "^7.6.0"
   },
+  "scripts": {
+    "start": "node script.js"
+  },
   "dependencies": {
     "csvtojson": "^2.0.10"
   }
