@@ -2,19 +2,41 @@ const csv = require('csvtojson');
 
 const silverPlans = {};
 const zip_to_rate_areas = {};
-const zip_to_rate = {};
 
 csv()
   // find plans that are silver
+  // take rate area and return rate
   .fromFile('./plans.csv')
   .then((json) => {
     json
       .filter(row => row.metal_level === 'Silver')
       .forEach(row => {
-        if(silverPlans[row.rate_area]) {
-          silverPlans[row.rate_area] = 
-            silverPlans[row.rate_area].concat(row.rate);
-        } else {
+        if(silverPlans[row.rate_area] && silverPlans[row.rate_area].length > 1) {
+          // instead of sorting later, optimize to pick two lowest values
+          // unoptimized, giving 800+ values that we had to sort later
+          // silverPlans[row.rate_area] = 
+          //   silverPlans[row.rate_area].concat(row.rate);
+          if(row.rate < silverPlans[row.rate_area][0]){
+            silverPlans[row.rate_area] = 
+              [row.rate].concat(silverPlans[row.rate_area][0]);
+          }
+          if(row.rate < silverPlans[row.rate_area][1]){
+            silverPlans[row.rate_area] = 
+              [silverPlans[row.rate_area][0]].concat(row.rate);
+          }
+        } 
+        // assuming all rates for rate area are unique
+        else if(silverPlans[row.rate_area] && silverPlans[row.rate_area].length === 1){
+          if(row.rate < silverPlans[row.rate_area][0]){
+            silverPlans[row.rate_area] = 
+              [row.rate].concat(silverPlans[row.rate_area][0]);
+          }
+          else if(row.rate > silverPlans[row.rate_area][0]){
+            silverPlans[row.rate_area] = 
+              [silverPlans[row.rate_area][0]].concat(row.rate);
+          }
+        }
+        else {
           silverPlans[row.rate_area] = [row.rate];
         }
       });
@@ -36,11 +58,6 @@ csv()
           .filter(row => row[1].size <= 1);
         // only return zipcode with one rate, leaving off ambiguous..
 
-        //  [ '10045', Set(1) { '4' } ]
-        // { zipcode: '47387', rate: '' }
-        //   zip_to_rate_areas => '00698': Set(1) { '1' }
-        // silver { '7': [ '298.62' ], '60': [ '421.43' ] }
-
       // take zipcode and find rate
       }).then(() => {
       // final scan where we output the rows of zip, second lowest rate
@@ -48,29 +65,20 @@ csv()
         csv()
           .fromFile('./slcsp.csv') // zipcode, need rate
           .then((json) => {
-            // console.log(Object.keys(zip_to_rate_areas));
-            json.forEach((row, i) => { 
+            json.forEach((row) => { 
               // take zipcode => rate area => rate
-              if(Object.keys(zip_to_rate_areas)
-                .filter((key, i) => key === row.zipcode)){
-                console.log('keys', Object.values(zip_to_rate_areas));
-
-                // console.log(zip_to_rate_areas[row.zipcode].values());
-                // gives rate area 
-                // console.log('va', zip_to_rate_areas);
-                // zip_to_rate[row.zipcode[i]] = Object.values(zip_to_rate_areas);
-                
-                // get rate from silverPlans {}
-              
-              } else {
-                // console.log('else');
+              const key_rate_area = zip_to_rate_areas[row.zipcode];
+              if(key_rate_area.size === 1){
+                const rate = Array.from(key_rate_area)[0];
+                const smallest_silver_rates = silverPlans[rate];
+                console.log('zipcode', row.zipcode, 'rate', smallest_silver_rates[1]);
               }
-
-              // zip_to_rate[row.zipcode] = rate_area
-              // connect rate_area to 2nd lowest rate
+              else if(key_rate_area.size > 1){
+                const blankRate =
+              }
             });
-
-        
           });
       });
   });
+// no second silver plan
+// zipcode in two rate areas
