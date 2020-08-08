@@ -2,6 +2,7 @@
   "name": "AdHoc",
   "version": "1.0.0",
   "description": "",
+  "main": "script.js",
   "keywords": [],
   "author": "Fiona Ochs",
   "license": "ISC",
