@@ -1,10 +1,11 @@
-# To run solution
-#  install pandas and numpy
-#  run, python solution.py
-#  will create new final.csv file with zipcode,rate
-
 import pandas as pd
 import numpy as np
+from zipfile import ZipFile
+
+zipObj = ZipFile('solution.zip', 'w')
+zipObj.write('solution.py')
+zipObj.write('COMMENTS.md')
+zipObj.close()
 
 plans = pd.read_csv('plans.csv')
 zips = pd.read_csv('zips.csv')
@@ -48,3 +49,4 @@ final_df = final_table[['zipcode', 'second_smallest_rate']].rename(columns={'sec
 
 # write to new csv
 final_df.to_csv('final.csv',index=False)
+
