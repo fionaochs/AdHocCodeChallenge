@@ -9,7 +9,6 @@ zipcode_rate = pd.read_csv('slcsp.csv')
 # match only silver plans
 # assuming rate_area is (state, number) tuple, so group by state, rate_area
 # apply list of all rates for state,rate_area
-# optimize by not applying whole array of all rates but just grabbing first and second lowest
 rate_area_to_list_rate = plans.loc[plans['metal_level'] == 'Silver'].groupby(['state','rate_area'])['rate'].apply(list).reset_index(name = 'list_rates')
 
 # function for second smallest value
@@ -17,7 +16,6 @@ def secondSmallest(list_rate):
     if len(list_rate) < 2:
         return np.nan
     # make unique before sorting
-    # soring takes O(nlogn)
     second_smallest = sorted(list(set(list_rate)))[1]
     return second_smallest
 

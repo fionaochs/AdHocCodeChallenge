@@ -1,4 +1,5 @@
-## To run solution
+## To compile
+To run solution
 - install pandas and numpy
   ``` pip install pandas ```
   ``` pip install numpy ```
